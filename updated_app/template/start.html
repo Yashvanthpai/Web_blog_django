@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> 
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+      <title>BlogHousE</title>
+    
+              <style>
+                    
+                    th{
+                          border: 2px solid black;
+                    }
+                    .card{
+                        cursor: pointer;
+                        margin-top: 7px;
+                        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+                    }
+                    .popup{
+                      position: absolute;
+                      left:15%;
+                      top: 15%;
+                      height: 520px;
+                      width: 950px;
+                      margin: auto;
+                      background: white;
+                      /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
+
+                    }
+                    .card-text{
+                      
+                      height: 150px;
+                      overflow: hidden;
+                      padding: 5px;
+                    }
+                  </style>
+    {% block links %}
+    
+    {% endblock %}
+</head>
+
+<body>
+     <strong>
+        <nav class="navbar navbar-expand-lg navbar-light " style="height:55px;background-color: rgb(233, 192, 195)">
+               <div class="container">
+                {% block navlogin %}
+                <ul class="navbar-nav mr-auto">
+                    <a class=" btn btn-sm btn-outline-secondary" href="/" role="button" style=" font-size: larger;margin-left:12px; ">Home</a>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <a class=" btn btn-sm btn-outline-secondary"  role="button" style="margin-left:12px; " href="{% url 'login' %}">Login!</a>
+                    <a class=" btn btn-sm btn-outline-secondary"  role="button" style="margin-left:12px; " href="{% url 'register' %}">Sign up!</a>
+                    <a class=" btn btn-sm btn-outline-secondary"  role="button" style="margin-left:12px; " href="admin">Admin</a>
+                   
+                </ul>
+                {% endblock %}
+               </div>
+        </nav>
+    </strong>
+         {% block messageblock %}
+         {% endblock %}
+        
+    <div class="container-fluid mt-4" >
+         {% block content %}
+          <div class="row">
+              <div class="col-6" style="height: 70%; ">
+                    <h2 style=" text-align: center; color: rgb(138, 116, 116);padding: 3%; background: rgba(255, 255, 255, 0.486)"><strong><i>Welecom to BlogHousE</i></strong></h2>
+                    <img src="{% static 'notes.png' %}" alt="hello" style="width: 100%; height: 400px;">
+              </div>
+              <div class="col-6" style="height:515px;overflow: auto;" >
+                  <h5 style=" text-align: center; color: rgb(138, 116, 116);padding: 1%; background: rgba(255, 255, 255, 0.486)"><strong><i>Blog of the day</i></strong></h5>
+
+
+                  {% for x, y in data.items %}
+                  <a href="{% url 'logedin' %}" style="cursor: pointer ; color: black; text-decoration: none">  
+                      <div class="card" >
+                                        <div class="card-body">
+                                            <div class="row">
+                                                    <div class="col-7" >
+                                                
+                                                      <h5 class="card-title" style="display: inline-block;">{{y.subject}}</h5>
+                                                      <h7 style="display: inline-flex; float: right;  width: 25% ">{{y.date}}</h7>
+                                                      <p class="card-text">{{y.content}}</p>
+                                                    </div>
+                                                    
+                                                    <div  class="col" style="border-left: 1px solid rgb(190, 190, 190)">
+                                                      <div style=" width:90% ;margin: auto; cursor: pointer;" >
+                                                          <img id="img_prof"  style="width: 250px; height: 150px;" src="{% static y.file %}" class="img-thumbnail" alt="Cinque Terre"> 
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                     </div>
+                                </div>
+                              </a> 
+
+                  {% endfor%}
+              </div>
+          </div>    
+          {% endblock %}
+    </div>
+    <div class="back_ground" >
+        
+    </div>
+    <div class="popup" style="padding: 40px; display: none">
+       <div class="img_div" style="width: 350px; height: 200px; float: right;">
+          <img id="img_prof" onclick="openimage_view(this)" style="width: 250px; height: 150px; float: right" src="https://images.unsplash.com/photo-1444465693019-aa0b6392460d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" class="img-thumbnail" alt="Cinque Terre"> 
+       </div>
+    
+          <h1 class="card-title" >Valley Bootcamp</h1>
+          <br><br>
+          <h4 >07/06/2019</h4>
+          <br><br><br>
+          <p class="card-text" style="font-size: larger; height: 190px;overflow: auto;">The function of a paragraph is to mark a pause, setting the paragraph apart from what precedes it. If a paragraph is preceded by a title or subhead, the indent is superfluous and can therefore be omitted</p>
+
+
+    </div>
+
+
+    {% block notify%}
+    {% endblock %}
+</body>
+</html>

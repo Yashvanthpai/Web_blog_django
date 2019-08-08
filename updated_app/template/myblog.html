@@ -1,0 +1,109 @@
+{% extends 'start.html' %}
+{% load staticfiles %}
+{% block navlogin %}
+  <ul class="navbar-nav mr-auto">
+        <a class=" btn btn-sm btn-outline-secondary" href="/" role="button" style="margin-left:12px; ">Home</a>
+  </ul>
+<ul class="navbar-nav ml-auto">        
+        {% if user.is_authenticated %}
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fas fa-user" style="margin-right: 15px;"></i><strong>{{user.username}}</strong>
+              </a>
+              <div class="dropdown-menu dropdown-menu-left " aria-labelledby="navbarDropdownMenuLink">
+                <strong><i> 
+                    <a class="dropdown-item" href="{% url 'logout' %}" >Logout</a>
+                </i></strong>
+              </div>
+          </li>
+        {% endif %}
+        
+    </ul>
+{% endblock %}
+
+{% block content %}
+  <style>
+      body{
+          background-image: url("{% static 'notes.png' %}");
+          background-repeat: no-repeat;
+          background-attachment: fixed;  
+      }
+      .card{
+          height: 450px;
+          width: 85%;
+          margin: auto;
+          background: rgba(255, 255, 255, 0.74);
+          margin-top: 25px;
+      }
+      
+  </style>
+  
+  <div class="row">
+      <div class="card">
+                    <div class="card-body" style=" padding:30px;">
+                        <div class="row">
+                                <div class="col-9" >
+                            
+                                  <h1 class="card-title"  style="padding: 0;">Valley Bootcamp</h1>
+                                  <br>
+                                  <h4 >07/06/2019</h4>
+                                  <br>
+                                  
+                                  <p class="card-text" style="font-size:20px;">The function of a paragraph is to mark a pause, setting the paragraph apart from what precedes it. If a paragraph is preceded by a title or subhead, the indent is superfluous and can therefore be omitted</p>
+                                </div>
+                                
+                                <div  class="col" style="border-left: 1px solid rgb(190, 190, 190)">
+                                  <div style=" width:90% ;margin: auto; cursor: pointer;" >
+                                      <img id="img_prof" onclick="openimage_view(this)" style="width: 250px; height: 150px;" src="https://images.unsplash.com/photo-1444465693019-aa0b6392460d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" class="img-thumbnail" alt="Cinque Terre"> 
+                                    </div>
+                                </div>
+                            </div>
+                      <!-- dictionary is solution for it as we iterate through it while iterating only pass that iterator as argument-->
+                  <a  style="cursor: pointer;color: white; position: absolute; bottom: 25px; right: 25px; " class="btn btn-primary " onclick="openpostdivs(this)"><i class="fas fa-edit"></i></a>
+                  <a  style="cursor: pointer;color: white; position: absolute; bottom: 25px; right: 77px; " class="btn btn-primary" onclick=""><i class="fas fa-trash"></i></a>
+                </div>
+                  </div>
+        
+      </div>
+  </div>
+  
+
+<script>
+    
+  $( function() {
+    $("input[name=Date]").datepicker({
+      changeMonth: true,
+      changeYear: true
+    });
+  } );
+
+
+function didi(){
+  alert($("input[name=Date]").val())
+}
+function openpostdivs(p) {
+  var arr=['h5','h7','p'];
+  var key = ['title','date','body']
+  var val ={'title':"",'date':"",'body':""};
+  for (var i=0;i<arr.length;i++){
+      val[key[i]] = $($(p).parent()).find(arr[i]).text()
+  }
+  
+  
+  document.getElementById("back_gg").style.display = "block";
+  document.getElementById("postdivs").style.display = "block";
+  setvalue(val)
+ 
+}
+function setvalue(x){
+  $("input[name=Subject]").val(x["title"])
+  $("textarea[name=Post]").val(x["body"])
+  $("input[name=Date]").val(x["date"])
+  
+}
+function deldivsconf() {
+  document.getElementById("back_gg").style.display = "block";
+  document.getElementById("deldivs").style.display = "block";
+}
+</script>
+{% endblock %}

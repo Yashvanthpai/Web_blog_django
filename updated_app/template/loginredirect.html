@@ -1,0 +1,246 @@
+{% extends 'start.html' %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% block links %}
+  
+    <style>
+            #formdivs,#imgdivs{
+              background: rgb(255, 255, 255);
+              box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+              display: none;
+              position: fixed;
+              top: 10%;
+              left: 25%;
+            }
+            #back_gg{
+              position:absolute;
+              background: rgba(95, 94, 94, 0.87);
+              top: 0;
+              left: 0;
+              bottom: 0;
+              right: 0;
+              display: none;
+            }
+            .asteriskField{
+              display: none;
+            }
+            #post_blog{
+              background: white;
+              box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+              display: none;
+              position: fixed;
+              top: 1%;
+              left: 12%;
+              height: 630px;
+              background-image: url("{% static 'notes.png' %}");
+              background-repeat: no-repeat;
+              background-attachment: fixed;
+            }
+            .card{
+              margin-bottom: 8px;
+              background: rgba(224, 220, 220, 0.705);
+            }
+            body {
+                 background-image: url("{% static 'notes.png' %}");
+                 background-repeat: no-repeat;
+                 background-attachment: fixed; 
+            }
+   </style>
+    {% endblock %}
+    {% block navlogin %}
+          <ul class="navbar-nav mr-auto">
+              <a class=" btn btn-sm btn-outline-secondary" href="/" role="button" style=" font-size: larger;margin-left:12px; ">Home</a>
+        </ul>
+            
+            <ul class="navbar-nav ml-auto">
+                    <li onclick="post_blog()" class="nav-item active" style=" width:100px; text-align: center;cursor: pointer;" ><a class="nav-link"  ><i class="fas fa-edit"></i>Post</a></li>
+                    
+                    {% if user.is_authenticated %}
+                      <li class="nav-item dropdown">
+                          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <i class="fas fa-user" style="margin-right: 15px;"></i><strong >{{user.username}}</strong>
+                          </a>
+                          <div class="dropdown-menu dropdown-menu-left " aria-labelledby="navbarDropdownMenuLink">
+                            <strong><i>
+                                <a class="dropdown-item" href="{% url 'mypost' %}" >MyPost</a>  
+                                <a class="dropdown-item" href="{% url 'logout' %}" >Logout</a>
+                            </i></strong>
+                          </div>
+                      </li>
+                    {% endif %}
+                    
+                </ul>
+    {% endblock %}
+    {% block messageblock %}
+        {% if messages %}
+        {% for message in messages %}
+        {% if user.is_authenticated %}
+          <p class="message" style="width: 75%;margin: auto; height: 30px; text-align: center; background: rgb(164, 238, 164);color: black;border-radius: 15px;">{{ message }} {{ user.username}}</p>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+     
+    {% endblock %}
+{% block content %}
+    <div  style="margin-top: 12px;" class="container">
+
+       {% for key,val  in data.items %}
+
+       <div class="card">
+          <div class="card-body" style="padding: 30px;">
+              <div class="row">
+                  <div class="col-9" >
+                      <h1 class="card-title"  style="padding: 0;">{{val.subject}}</h1>
+                      <br>
+                      <h4 >{{val.date}}</h4>
+                      <br>
+                      <p class="card-text" style="font-size:20px; overflow: auto; height: 250px;">{{val.content}}
+                      </p>
+                  </div>
+                    
+              <div  class="col" style="border-left: 1px solid rgb(190, 190, 190)">
+                      <div style=" width:90% ;margin: auto; cursor: pointer;" >
+                          <img id="img_prof" onclick="openimage_view(this)" style="width: 250px; height: 150px;" src="{% static val.file %}" class="img-thumbnail" alt="Cinque Terre"> 
+                      </div>
+              </div>
+          </div>
+        <i style="position: absolute; bottom: 15px; right: 100px;"><strong><p style="color: rgba(114, 84, 84, 0.596)" id="author">{{val.username}}</p></strong></i>
+        <a  style="cursor: pointer;color: white;float: right;" class="btn btn-primary" onclick="deletepost(this)"><i class="fas fa-trash"></i></a>
+      </div>
+      </div>
+
+
+       {% endfor %}
+
+        <div class="card">
+            <div class="card-body" style="padding: 30px;">
+                <div class="row">
+                    <div class="col-9" >
+                        <h1 class="card-title"  style="padding: 0;">Valley Bootcamp</h1>
+                        <br>
+                        <h4 >07/06/2019</h4>
+                        <br>
+                        <p class="card-text" style="font-size:20px; overflow: auto; height: 250px;">The function of a paragraph is to mark a pause, setting the paragraph apart from what precedes it. If a paragraph is preceded by a title or subhead, the indent is superfluous and can therefore be omitted
+                        </p>
+                    </div>
+                      
+                <div  class="col" style="border-left: 1px solid rgb(190, 190, 190)">
+                        <div style=" width:90% ;margin: auto; cursor: pointer;" >
+                            <img id="img_prof" onclick="openimage_view(this)" style="width: 250px; height: 150px;" src="https://images.unsplash.com/photo-1444465693019-aa0b6392460d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" class="img-thumbnail" alt="Cinque Terre"> 
+                        </div>
+                </div>
+            </div>
+          <a style="cursor: pointer;color: white;float: right;" class="btn btn-primary" onclick="deletepost(this)"><i class="fas fa-trash"></i></a>
+          <i style="position: absolute; bottom: 15px; right: 100px;"><strong><p style="color: rgba(114, 84, 84, 0.596)" id="author">Yashvanth Pai</p></strong></i>
+        </div>
+        </div>
+
+
+        
+
+
+
+    </div>
+
+    <!-- background-->
+    <div id="back_gg" onclick="closeimg()" style="width: 100%; height :100% ;">
+    </div>
+
+    <!-- form popup-->
+    <div class="container" id="formdivs" style="width: 50%; height: 450px; margin:auto; background-color: rgba(255, 255, 255, 0.486);  ">
+            <button type="button" class="close" aria-label="Close" style="padding:2%;" onclick="closeimg()">
+                <span aria-hidden="true">&times;</span>
+             </button>
+        
+             <h3 style="padding:5%; margin-left: 30px;color: black"><strong><i>Do want to continue?</i></strong></h3>
+       
+            <hr style="background-color: rgb(146, 144, 141); width: 80%; margin: auto;">   
+             <strong>
+                <form id="myform" style="width: 60%; padding: 5% ; margin:auto;" method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}   
+                    <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+             </strong>
+            <hr style="background-color: rgb(146, 144, 141); width: 80%; margin: auto;">
+    </div>
+
+    
+    <!-- image popup-->
+    <div class="card" id="imgdivs" style="width: 60%; height: 400px; margin:auto; background-color: rgba(255, 255, 255, 0.486) ">
+        <button type="button" class="close" aria-label="Close" style="padding:2%;" onclick="closeimg()">
+            <span aria-hidden="true">&times;</span>
+         </button>
+         <div style=" width:90%;height: 90%; ;margin: auto;padding: 21px;" >
+            <img id="img_prof2" style="width: 90%; height: 100%; " src="" class="img-thumbnail" alt="Cinque Terre"> 
+        </div>
+    </div>
+
+    <!--Post-->
+    <script>
+        $( function() {
+          $("input[name=Date]").datepicker({
+            changeMonth: true,
+            changeYear: true
+          });
+        } );
+      </script>
+    <div class="card" id='post_blog' style="display: none; width: 70%">
+      <div class="cardbody">
+           <div class="card" style="width: 100%; height: 630px; margin: auto; background: rgba(187, 175, 175, 0.733)">
+              <button type="button" class="close" aria-label="Close" style="padding:1%; position: absolute;top:5px;right: 10px;;" onclick="closeimg()">
+                  <span aria-hidden="true">&times;</span>
+               </button>
+               <strong>
+              <h3 style="text-align: center;color: rgba(161, 114, 114, 0.877); padding: 1%;">Fillout form</h3>
+              <form method="post" enctype="multipart/form-data" style="width: 70%; margin:auto;">
+                  {% csrf_token %}
+                  {{ formp|crispy }}   
+                  <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+            </strong>
+           </div>
+      </div>
+
+    </div>
+    
+<script>
+function post_blog(){
+   $('#post_blog').css('display','block');
+   document.getElementById("back_gg").style.display = "block";
+}
+function deletepost(x){
+  var ptr = $($(x).parent()).parent();
+  $(ptr).css('display','none');
+}
+
+function openForm() {
+  document.getElementById("back_gg").style.display = "block";
+  document.getElementById("formdivs").style.display = "block";
+}
+
+function openimage_view(x){
+  document.getElementById("back_gg").style.display = "block";
+  document.getElementById("imgdivs").style.display = "block";
+  document.getElementById("img_prof2").setAttribute("src",x.src);
+}
+
+function closeimg() {
+  document.getElementById("imgdivs").style.display = "none";
+  document.getElementById("formdivs").style.display = "none";
+  document.getElementById("back_gg").style.display = "none";
+  document.getElementById("post_blog").style.display = "none";
+}
+
+$(document).ready(function() {
+        // messages timeout for 10 sec 
+        setTimeout(function() { 
+            $('.message').fadeOut('slow');
+        }, 5000); // <-- time in milliseconds, 1000 =  1 sec
+
+    });
+
+</script>
+{% endblock %}
+

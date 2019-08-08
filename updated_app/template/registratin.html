@@ -1,0 +1,51 @@
+{% extends 'start.html' %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+    {% block links %}
+    <style>
+        #formid{
+            background: rgba(230, 214, 214, 0.815);
+            width: 50%;
+            padding: 30px;
+            margin: auto; 
+        }
+        .asteriskField{
+          display: none;
+        }
+        body{
+          background-image: url("{% static 'notes.png' %}");
+          background-repeat: no-repeat;
+          background-attachment: fixed;  
+      }
+    </style>
+    {% endblock %}
+    {% block navlogin %}
+            <ul class="navbar-nav mr-auto">
+                <a class=" btn btn-sm btn-outline-secondary" href="/" role="button" style="margin-left:12px; ">Home</a>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <a class=" btn btn-sm btn-outline-secondary"  role="button" style=" margin-left:12px;" href="{% url 'login' %}">Login</a>
+            </ul>
+
+    {% endblock %}
+{% block content %}
+         
+            <form class="card" id="formid" method="post" enctype="multipart/form-data" style="margin-top:5%;margin-bottom: 5% ;" >
+                <strong>
+                    <h3 style="text-align: center; padding:0%;"><strong>Register Here</strong></h3>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    {{ form1|crispy }}
+                    <button type="submit" class="btn btn-success">Register</button>
+                </strong>        
+            </form>
+<script>
+  $( function() {
+    $("input[name=bdate]").datepicker({
+      changeMonth: true,
+      changeYear: true
+    });
+  } );
+</script>
+{% endblock %}
+
