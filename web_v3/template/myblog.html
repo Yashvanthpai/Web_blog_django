@@ -1,0 +1,535 @@
+{% extends 'start.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block navlogin %}
+<ul class="navbar-nav ml-auto">   
+    <li onclick="post_blog()" class="nav-item active" style=" width:80px; text-align: center;cursor: pointer;" ><a class="nav-link"  ><i class="fas fa-edit"></i>Post</a></li> 
+  
+        {% if user.is_authenticated %}
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fas fa-user" style="margin-right: 15px;"></i><strong>{{user.username}}</strong>
+              </a>
+              <div class="dropdown-menu dropdown-menu-left " aria-labelledby="navbarDropdownMenuLink">
+                <strong>
+                    <a class="dropdown-item" href="{% url 'logedin' %}" >Post feed</a> 
+                    <a class="dropdown-item" href="{% url 'password_change' %}" >Change Password</a>
+                    <a class="dropdown-item" onclick="logout_conform()" >Logout</a>
+                  </strong>
+              </div>
+          </li>
+        {% endif %}
+        
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+<style>
+  body{
+      background-image: url("{% static 'notes.png' %}");
+      background-repeat: no-repeat;
+      background-attachment: fixed;  
+  }
+  .card{
+     
+      width: 95%;
+      margin: auto;
+      background:  rgba(245, 245, 245, 0.94);
+      margin-bottom: 15px;
+  }
+  #back_gg{
+              position:absolute;
+              background: rgba(95, 94, 94, 0.87);
+              top: 0px;
+              left: 0px;
+              width: 100%;
+              display: none;
+            }
+  .asteriskField{
+              display: none;
+            }
+  #post_blog{
+              background: white;
+              box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+              display: none;
+              position: fixed;
+              top: 1%;
+              left: 16%;
+              height: 630px;
+              background-image: url("{% static 'notes.png' %}");
+              background-repeat: no-repeat;
+              background-attachment: fixed;
+            }
+  #imgdivs{
+              background: rgb(255, 255, 255);
+              box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+              display: none;
+              position: fixed;
+              top: 10%;
+              left: 25%;
+              
+          }#cmttext{
+          padding: 0;
+          margin: 0;
+          padding-left:10px;
+          border-left: 1px solid rgb(136, 133, 133);   
+        }
+        #commentrow{
+          width: 100%;
+          margin: auto;
+          /* box-shadow: 0 4px 8px 0 rgba(0,0,0,.19), 0 6px 20px 0 rgba(0,0,0,.2); */
+          border-radius: 18px;
+          background-color: rgb(238, 238, 238);
+          border: 1px solid rgba(156, 145, 145, 0.849);
+          margin-top: 10px;
+        }
+        #commenttext{
+          font-size: 13px;
+          padding: 0px;
+          margin: 0px;
+          font-family: 'Lora', serif;
+        }
+        #cmt-auther{
+          padding: 0;
+          padding-right:10px; 
+          margin: 0;
+          font-size: 13px;
+          font-family: 'Dancing Script', cursive;
+          text-align: right;
+          color: rgba(104, 104, 104, 0.884);}
+        
+        input[name="title"]{
+          padding: 0;
+          font-size: 30px;
+          background: transparent;
+          border-style: none;
+        }
+
+        input[name="Date"]{
+          margin-top:10px; 
+           font-size: 15px;
+           background: transparent;
+           float: right;
+           text-align: right;
+           border-style: none;
+        }
+        textarea[name='content']{
+          margin-top:2%; 
+          font-size: 18px;
+          background: transparent;
+          border-style: none;
+          height: 200px;
+          width: 100%;
+        }
+        
+</style>
+<div class="container">
+    <div class="card">
+        <div class="card-body" style=" padding:30px;">
+            <div class="row">
+                    <div class="col-9" >
+                
+                      <input type="text" name="title" value="Valley Bootcamp">
+                      <input type="text" name="Date" value="07/06/2019">
+                      <textarea name="content"  cols="30" rows="25" >
+                      The function of a paragraph is to mark a pause, setting the paragraph apart from what precedes it. If a paragraph is preceded by a title or subhead, the indent is superfluous and can therefore be omitted
+                      </textarea>
+
+                    </div>
+                    
+                    <div  class="col" style="border-left: 1px solid rgb(190, 190, 190)">
+                      <div style=" width:90% ;margin: auto; cursor: pointer;" >
+                          <img id="img_prof" onclick="openimage_view(this)" style="width: 250px; height: 150px;" src="https://images.unsplash.com/photo-1444465693019-aa0b6392460d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" class="img-thumbnail" alt="Cinque Terre"> 
+                        </div>
+                    </div>
+                </div>
+      <a  style="cursor: pointer;color: white; position: absolute; bottom: 25px; right: 25px; " class="btn btn-primary " onclick=""><i class="fas fa-edit"></i></a>
+    </div>
+      </div>
+  {% for key,val  in data.items %}
+
+  <div class="card">
+      <p id="msg" style="width: 75%; margin: auto;text-align: center;background-color: green;color: whitesmoke;display: none;border-radius: 8px;"></p>
+            <div id='cardbody' class="card-body" style="padding: 25px;">
+                    <div class="row">
+                          <div class="col-sm-9" >
+                              <input type="text" name="title" value="{{val.subject}}" readonly>
+                              <input type="text" name="Date" value="{{val.date}}" readonly>
+                              <textarea name="content"  cols="15" rows="25" readonly>
+                                  {{val.content}}
+                              </textarea>
+                          </div>
+                            
+                          <div  class="col-sm-3 mt-4" style="border-left: 1px solid rgb(190, 190, 190);">
+                                  <div style=" width:90% ;margin: auto; cursor: pointer;" >
+                                      <img id="img_prof" onclick="openimage_view(this)" style="width: 250px; height: 150px;" src="{% static val.file %}" class="img-thumbnail" alt="Cinque Terre"> 
+                                  </div>
+                          </div>
+                    </div>
+                    <div id="buttons" class="mt-2" style="text-align: right;">
+                        <p id="blogid" style="display: none">{{val.blogid}}</p>
+                        <button  class="btn btn-primary" onmouseover="addtext(this,'edit')" onmouseout="removetext(this,'edit',0)" onclick="editpost(this)"><i class="fas fa-edit"></i></button>
+                        <button  class="btn btn-primary" onmouseover="addtext(this,'delete')" onmouseout="removetext(this,'delete',0)" onclick="delete_conform(this,'delete')"><i class="fas fa-trash" ></i></button>
+                        <button class="btn btn-success "  onmouseover="addtext(this,'comment')" onmouseout="removetext(this,'comment',0)" onclick="comments(this)"><i class="fa fa-comment"></i></button>
+                        {% if val.like == "True" %}
+                        <button class="btn btn-primary " onclick="likefunc(this)" onmouseover="addtext(this,'like')" onmouseout="removetext(this,'like',1)" style="background-color: blue;color: white"><i style="color: white" class="fa fa-thumbs-up"></i></button>
+                        {% else %}
+                        <button class="btn btn-primary " onclick="likefunc(this)" onmouseover="addtext(this,'like')" onmouseout="removetext(this,'like',0)" style="background-color: white;color: black;"><i style="color: black" class="fa fa-thumbs-up"></i></button>
+                        {%  endif %}                
+                        <p style="color: rgba(114, 84, 84, 0.596);font-family: 'Dancing Script', cursive;" id="author">~{{val.username}}</p>
+                    </div>
+                    <div class="mt-2" id="update-btn" style="display:none;text-align: right;">
+                        <p id="blogid" style="display: none">{{val.blogid}}</p>
+                        <button class="btn btn-primary" onclick="updatepost(this,'update')">Update</button>
+                        <button class="btn btn-secondary ml-2" onclick="cancelupdate(this)">Cancel</button>
+                        <p style="color: rgba(114, 84, 84, 0.596);font-family: 'Dancing Script', cursive;" id="author1">~{{val.username}}</p>
+                       
+                    </div> 
+                      
+                    <hr>
+                    <div id="comment" class="container" style="display: none;">
+                                  <div class="cont" id="comment-cont" style="height: 200px ; overflow:auto ; scrollbar-width: thin  ">
+                                  
+                                  </div>
+                    </div>
+          
+            </div>
+    </div>
+
+
+{% endfor %}
+
+
+</div>
+
+ <!-- background-->
+  <div id="back_gg" onclick="closeimg()">
+  </div>
+ 
+  <!--Post form-->
+  <div class="card" id='post_blog' style="display: none; width: 70%; ">
+        <div class="cardbody">
+             <div class="card" style="width: 100%; height: 630px; margin: auto; background: rgba(187, 175, 175, 0.733)">
+                <button type="button" class="close" aria-label="Close" style="padding:1%; position: absolute;top:5px;right: 10px;;" onclick="closepost()">
+                    <span aria-hidden="true">&times;</span>
+                 </button>
+                 <strong >
+                <h3 style="text-align: center;color: rgba(161, 114, 114, 0.877); padding: 1%;">Fillout form</h3>
+                {% if exception != "None"%}
+                      <div class="container" style="background-color: white;">
+                        <p style="text-align: center;color: red;padding: 1%">{{exception}}</p>
+                      </div>
+                {% endif %}
+                <form method="post" enctype="multipart/form-data" style="width: 70%; margin:auto;">
+                    {% csrf_token %}
+                    {{ formp|crispy }}   
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+              </strong>
+             </div>
+        </div>
+  </div>
+  
+  <!-- image popup-->
+    <div class="card" id="imgdivs" style="width: 60%; height: 400px; margin:auto; background-color: rgba(255, 255, 255, 0.486) ">
+        <button type="button" class="close" aria-label="Close" style="padding:2%;" onclick="closeimg()">
+            <span aria-hidden="true">&times;</span>
+         </button>
+         <div style=" width:90%;height: 90%; ;margin: auto;padding: 21px;" >
+            <img id="img_prof2" style="width: 90%; height: 100%; " src="" class="img-thumbnail" alt="Cinque Terre"> 
+        </div>
+    </div>
+
+<script>
+  var data ={}
+function logout_conform(){
+  if(confirm("Are you sure you want to logout ?")){
+      window.location="{% url 'logout' %}"
+  }
+}
+ function addtext(ptr,str) {
+   if (str == 'edit'){
+     $(ptr).text(" Edit Blog")
+   }else if(str == 'comment'){
+    $(ptr).text(" Comment")
+   }else if(str == 'delete'){
+   $(ptr).text(" Delete Blog")
+   }else{
+    $(ptr).text(" Like")
+   } 
+ }
+
+ function removetext(ptr,str,no) {
+   if (str == 'edit'){
+     $(ptr).text("")
+     $(ptr).append('<i class="fas fa-edit" ></i>')
+   }else if(str == 'comment'){
+    $(ptr).text("")
+    $(ptr).append('<i class="fas fa-comment" ></i>')
+   }else if(str == 'delete'){
+    $(ptr).text("")
+    $(ptr).append('<i class="fas fa-trash" ></i>')
+   }else{
+    if (no==1){
+    $(ptr).text("")
+    $(ptr).append('<i style="color: white" class="fa fa-thumbs-up"></i>')
+    }else{
+      $(ptr).text("")
+    $(ptr).append('<i style="color: black" class="fa fa-thumbs-up"></i>')
+    }
+   } 
+ }
+
+ function editpost(ptr) {
+   const button_div  = $(ptr).parents('#buttons')
+   const main_div =$(ptr).parents('#cardbody')
+   const input_title = $(main_div).find('input[name=title]')
+   const input_date = $(main_div).find('input[name=Date]')
+   const input_content = $(main_div).find('textarea[name=content]')
+   
+   $(input_date).datepicker({
+      changeMonth: true,
+      changeYear: true
+    });
+
+   $(input_title).attr('readonly',false)
+   $(input_date).attr('readonly',false)
+   $(input_content).attr('readonly',false)
+
+   var date = $(input_date).datepicker("getDate");
+   data ={'title':$(input_title).val(),'post_date':$(input_date).val(),'body':$(input_content).val()}
+   
+   $(input_date).val($.datepicker.formatDate("yy-mm-dd", date));
+
+   $(input_title).css('border-style','solid')
+   $(input_date).css('border-style','solid')
+   $(input_content).css('border-style','solid')
+
+
+   $(button_div).css('display','none')
+   $($(main_div).find('#update-btn')).css('display','block')
+
+
+    
+ 
+  
+ }
+ function cancelupdate(ptr) {
+
+   const main_div =$(ptr).parents('#cardbody')
+   const input_title = $(main_div).find('input[name=title]')
+   const input_date = $(main_div).find('input[name=Date]')
+   const input_content = $(main_div).find('textarea[name=content]')
+
+   $(input_title).val(data['title'])
+   $(input_date).val(data['post_date'])
+   $(input_content).text(data['body'])
+
+   $(input_title).attr('readonly',true)
+   $(input_date).attr('readonly',true)
+   $(input_content).attr('readonly',true)
+
+   $(input_title).css('border-style','none')
+   $(input_date).css('border-style','none')
+   $(input_content).css('border-style','none')
+
+   $($(main_div).find('#buttons')).css('display','block')
+   $($(main_div).find('#update-btn')).css('display','none')
+
+   $(input_date).datepicker("destroy");
+   $(input_date).removeClass("hasDatepicker").removeAttr('id');
+
+ }
+ function delete_conform(ptr,str) {
+      if (confirm('Are you sure you want to delete this post permanetly ?')) {
+        updatepost(ptr,str) 
+      } else {
+          // Do nothing!
+      }
+ }
+
+
+ function updatepost(ptr,str){
+  const blogid =$(ptr).parent().find('#blogid').text()
+  const main_div =$(ptr).parents('#cardbody')
+  const input_title = $(main_div).find('input[name=title]')
+  const input_date = $(main_div).find('input[name=Date]')
+  const input_content = $(main_div).find('textarea[name=content]')
+
+  var option = null
+
+   if(str == 'update'){
+          data ={'blogid':blogid,'title':$(input_title).val(),'post_date':$(input_date).val(),'body':$(input_content).val()}
+          option ="update"
+   }else{
+          option ="delete"
+          data ={'blogid':blogid}
+   }
+
+   console.log(option+"\n"+data)
+
+   $.ajax({
+     url : "{% url 'updatepost' %}",
+     type: "POST",
+     headers: {"X-CSRFToken":"{{csrf_token}}"},
+     data : {"option":option,"values":data},
+     success : function(ptr){
+      if (option =="update"){
+                $(input_title).val($(input_title).val());
+                $(input_date).val($(input_date).val());
+                $(input_content).val($(input_content).val());
+
+                $(input_title).attr('readonly',true)
+                $(input_date).attr('readonly',true)
+                $(input_content).attr('readonly',true)
+
+                $(input_title).css('border-style','none')
+                $(input_date).css('border-style','none')
+                $(input_content).css('border-style','none')
+
+                $($(main_div).find('#buttons')).css('display','block')
+                $($(main_div).find('#update-btn')).css('display','none')
+
+                $(input_date).datepicker("destroy");
+                $(input_date).removeClass("hasDatepicker").removeAttr('id');
+
+                const msgs = $(main_div).parent().find("#msg");
+                    $(msgs).css('display','block');
+                    $(msgs).text("Update sucessfull");
+                    $(msgs).fadeOut(3000,function(){
+                    $(msgs).css('display','none');
+                });
+      }else{
+              const msgs = $(main_div).parent().find("#msg");
+              const main_card = $(main_div).parent();
+               
+              $(msgs).css('display','block');
+              $(msgs).text("Delete sucessfull");
+
+              $(msgs).fadeOut(3000,function(){
+                     $(main_card).fadeOut(1000)
+              })
+              
+      }
+     },
+     error: function(){
+      const msgs = $(main_div).find("#msg");
+      $(msgs).css('display','block');
+      $(msgs).text("Update unsucessfull try again aftersome time");
+      $(msgs).fadeOut('2000',function(){
+        $(msgs).css('display','none');
+      });
+     }
+   })
+ }
+
+  function comments(ptr) {
+          var x  = {'blogid':$($(ptr).parents('#buttons')).find('#blogid').text()}
+          var y  =  $($(ptr).parents('#cardbody')).find('#comment-cont')
+          
+          $.ajax({
+            url : "{% url 'comment' %}",
+            type : "POST",
+            headers : {"X-CSRFToken":'{{ csrf_token }}'},
+            data : x,
+            success : function name(values){
+              $(y).empty()
+             for(var i in values.value){
+              var html =String("<div class='row' id='commentrow'>"+
+                          "<div class='col-sm-1' id ='cmtimg'>"+
+                                "<img width='45px' height='45px;' style='padding: 1px;' src='{% static 'index.jpg' %}' class='rounded-circle' alt='noimage'>"+
+                          "</div>"+
+                          "<div class='col-sm-11' id ='cmttext'>"+
+                                "<p id='commenttext'>{cmt}</p>"+
+                                "<p id='cmt-auther'>~{name}</p>"+
+                          "</div>"+
+                      "</div>")
+                html = html.replace('{cmt}',values.value[i][1])
+                html = html.replace('{name}',values.value[i][0])
+                $(y).append(html)
+             }
+            },
+            error : function name() {
+              alert("Some error ocuured during comment loading");
+            }
+          });
+          $($(ptr).parents('#cardbody')).find('#comment').fadeToggle()
+       }
+
+
+ function likefunc(ptr) {
+           var x = $(ptr).css('background-color')
+           var y ={"operation":"","blogid":$($(ptr).parents('#buttons')).find('#blogid').text()}
+           if (x == "rgb(255, 255, 255)"){
+            y["operation"]='update'
+           }else{
+            y["operation"]='delete'
+           }
+           $.ajax({
+             url : "{% url 'like' %}",
+             type : "POST",
+             headers: {"X-CSRFToken":"{{ csrf_token }}"},
+             data : y,
+             success : function name(val) {
+               if( y["operation"] =='update' ){
+                $(ptr).css('background-color','blue');
+                $($(ptr).find("#like-btn")).css('color','white');
+               }else{
+                $(ptr).css('background-color','white');
+                $($(ptr).find("#like-btn")).css('color','black');
+               }
+             },
+             error : function name(params) {
+               alert("System error try after some time");
+             }
+
+           })
+}
+
+function closepost(){
+   $('#post_blog').css('display','none');
+   document.getElementById("back_gg").style.display = "none";
+   $('body').css('overflow', 'scroll');
+   $('#navigationbar').css('z-index','1');
+   $('input[name=post_date]').datepicker("destroy");
+   $('input[name=post_date]').removeClass('hasDatepicker').removeAttr('id');
+}
+
+function post_blog(){
+   $('#post_blog').css('display','block');
+   document.getElementById("back_gg").style.display = "block";
+   $("#back_gg").css("height", $(document).height());
+   $('body').css('overflow','hidden');
+   $('#navigationbar').css('z-index','-1');
+
+   $('input[name=post_date]').datepicker({
+      changeMonth: true,
+      changeYear: true
+    });
+}
+
+function openimage_view(x){
+  document.getElementById("back_gg").style.display = "block";
+  document.getElementById("imgdivs").style.display = "block";
+  document.getElementById("img_prof2").setAttribute("src",x.src);
+  $("#back_gg").css("height", $(document).height());
+  $('body').css('overflow','hidden');
+  $('#navigationbar').css('z-index','-1');
+}
+
+function closeimg() {
+  document.getElementById("imgdivs").style.display = "none";
+  document.getElementById("back_gg").style.display = "none";
+  document.getElementById("post_blog").style.display = "none";
+  $('#navigationbar').css('z-index','1');
+  $('body').css('overflow', 'scroll')
+}
+</script>
+{% if exception != "None"%}
+      <script>
+      post_blog();
+      </script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,277 @@
+{% extends 'start.html' %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% block links %}
+  
+    <style>
+           #imgdivs{
+              background: rgb(255, 255, 255);
+              box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+              display: none;
+              position: fixed;
+              top: 10%;
+              left: 25%;
+              
+            }
+            #back_gg{
+              position:absolute;
+              background: rgba(95, 94, 94, 0.87);
+              top: 0px;
+              left: 0px;
+              width: 100%;
+              display: none;
+            }
+            .asteriskField{
+              display: none;
+            }
+            
+        .card{
+              margin-bottom: 20px;
+              background-color: rgba(245, 245, 245, 0.94);
+              cursor: default;
+              /* background: rgba(253, 253, 253, 0.884); */
+              box-shadow: 0 4px 8px 0 rgba(0,0,0,.3 ), 0 6px 20px 0 rgba(0,0,0,.4);
+          }
+          
+          #cmttext{
+          padding: 0;
+          margin: 0;
+          padding-left:10px;
+          border-left: 1px solid rgb(136, 133, 133);   
+        }
+        #commentrow{
+          width: 100%;
+          margin: auto;
+          /* box-shadow: 0 4px 8px 0 rgba(0,0,0,.19), 0 6px 20px 0 rgba(0,0,0,.2); */
+          border-radius: 18px;
+          background-color: rgb(238, 238, 238);
+          border: 1px solid rgba(156, 145, 145, 0.849);
+          margin-top: 10px;
+        }
+        #commenttext{
+          font-size: 13px;
+          padding: 0px;
+          margin: 0px;
+          font-family: 'Lora', serif;
+        }
+        #cmt-auther{
+          padding: 0;
+          padding-right:10px; 
+          margin: 0;
+          font-size: 13px;
+          font-family: 'Dancing Script', cursive;
+          text-align: right;
+          color: rgba(104, 104, 104, 0.884);
+        }
+        body{
+                 background-image: url("{% static 'notes.png' %}");
+                 background-repeat: no-repeat;
+                 background-attachment: fixed; 
+          }
+   </style>
+    {% endblock %}
+    {% block navlogin %}
+            
+            <ul class="navbar-nav ml-auto">
+                    {% if user.is_authenticated %}
+                      <li class="nav-item dropdown">
+                          <a class="nav-link dropdown-toggle" style="width: 80px;" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <i class="fas fa-user" style="margin-right: 10px;"></i><strong >{{user.username}}</strong>
+                          </a>
+                          <div class="dropdown-menu dropdown-menu-left " aria-labelledby="navbarDropdownMenuLink">
+                            <strong>
+                                <a class="dropdown-item" href="{% url 'mypost' %}" >MyPost</a> 
+                                <a class="dropdown-item" href="{% url 'password_change' %}" >Change Password</a>  
+                                <a class="dropdown-item" onclick="logout_conform()" >Logout</a>
+                            </strong>
+                          </div>
+                      </li>
+                    {% endif %}
+                    
+                </ul>
+    {% endblock %}
+    {% block messageblock %}
+        {% if messages %}
+        {% for message in messages %}
+        {% if user.is_authenticated %}
+          <p class="message" style="width: 75%;margin: auto; height: 30px; text-align: center; background: rgb(164, 238, 164);color: black;border-radius: 15px;">{{ message }} {{ user.username}}</p>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+     
+    {% endblock %}
+{% block content %}
+    <div  style="margin-top: 12px;" class="container" id="poster">
+
+       {% for key,val  in data.items %}
+
+          <div class="card">
+              <div id='cardbody' class="card-body" style="padding: 25px;">
+                  <div class="row">
+                        <div class="col-9" >
+                            <p style="padding: 0;font-size: 30px;"><strong>{{val.subject}}</strong><span style="margin-top: 13px;float: right;font-size: 15px;">{{val.date}}</span></p>
+                            <p class="card-text" style="font-size:18px; overflow: auto; height: 200px;">{{val.content}}
+                            </p>
+                        </div>
+                          
+                        <div  class="col" style="border-left: 1px solid rgb(190, 190, 190)">
+                                <div style=" width:90% ;margin: auto; cursor: pointer;" >
+                                    <img id="img_prof" onclick="openimage_view(this)" style="width: 250px; height: 150px;" src="{% static val.file %}" class="img-thumbnail" alt="Cinque Terre"> 
+                                </div>
+                        </div>
+                  </div>
+                  <div id="buttons" style="text-align: right;">
+                      <p id="blogid" style="display: none">{{val.blogid}}</p>
+                      <button  class="btn btn-primary" onclick="deletepost(this)"><i class="fas fa-trash"></i></button>
+                      <button class="btn btn-success " onclick="comments(this)"><i class="fa fa-comment"></i></button>
+                      {% if val.like == "True" %}
+                      <button class="btn btn-primary " onclick="likefunc(this)" style="background-color: blue"><i id="like" style="color: white" class="fa fa-thumbs-up"></i></button>
+                      {% else %}
+                      <button class="btn btn-primary " onclick="likefunc(this)" style="background-color: white"><i id="like" style="color: black" class="fa fa-thumbs-up"></i></button>
+                      {%  endif %}                
+                      <p style="color: rgba(114, 84, 84, 0.596);font-family: 'Dancing Script', cursive;" id="author">~{{val.username}}</p>
+                  </div>
+                  <hr>
+                  <div id="comment" class="container" style="display: none;">
+                                <div class="cont" id="comment-cont" style="height: 200px ; overflow:auto ; scrollbar-width: thin  ">
+                                
+                                </div>
+                  </div>
+            
+            </div>
+            </div>
+
+
+       {% endfor %}
+
+    </div>
+
+
+    <!-- background-->
+    <div id="back_gg" onclick="closeimg()">
+    </div>
+
+
+    
+    <!-- image popup-->
+    <div class="card" id="imgdivs" style="width: 60%; height: 400px; margin:auto; background-color: rgba(255, 255, 255, 0.486) ">
+        <button type="button" class="close" aria-label="Close" style="padding:2%;" onclick="closeimg()">
+            <span aria-hidden="true">&times;</span>
+         </button>
+         <div style=" width:90%;height: 90%; ;margin: auto;padding: 21px;" >
+            <img id="img_prof2" style="width: 90%; height: 100%; " src="" class="img-thumbnail" alt="Cinque Terre"> 
+        </div>
+    </div>
+
+
+    
+<script>
+function logout_conform(){
+  if(confirm("Are you sure you want to logout ?")){
+      window.location="{% url 'logout' %}"
+  }
+}
+
+
+
+function comments(ptr) {
+          var x  = {'blogid':$($(ptr).parents('#buttons')).find('#blogid').text()}
+          var y  =  $($(ptr).parents('#cardbody')).find('#comment-cont')
+          
+          $.ajax({
+            url : "{% url 'comment' %}",
+            type : "POST",
+            headers : {"X-CSRFToken":'{{ csrf_token }}'},
+            data : x,
+            success : function name(values){
+              $(y).empty()
+             for(var i in values.value){
+              var html =String("<div class='row' id='commentrow'>"+
+                          "<div class='col-sm-1' id ='cmtimg'>"+
+                                "<img width='45px' height='45px;' style='padding: 1px;' src='{% static 'index.jpg' %}' class='rounded-circle' alt='noimage'>"+
+                          "</div>"+
+                          "<div class='col-sm-11' id ='cmttext'>"+
+                                "<p id='commenttext'>{cmt}</p>"+
+                                "<p id='cmt-auther'>~{name}</p>"+
+                          "</div>"+
+                      "</div>")
+                html = html.replace('{cmt}',values.value[i][1])
+                html = html.replace('{name}',values.value[i][0])
+                $(y).append(html)
+             }
+            },
+            error : function name() {
+              alert("Some error ocuured during comment loading");
+            }
+          });
+          $($(ptr).parents('#cardbody')).find('#comment').fadeToggle()
+       }
+
+function likefunc(ptr) {
+           var x = $(ptr).css('background-color')
+           var y ={"operation":"","blogid":$($(ptr).parents('#buttons')).find('#blogid').text()}
+           if (x == "rgb(255, 255, 255)"){
+            y["operation"]='update'
+           }else{
+            y["operation"]='delete'
+           }
+           $.ajax({
+             url : "{% url 'like' %}",
+             type : "POST",
+             headers: {"X-CSRFToken":"{{ csrf_token }}"},
+             data : y,
+             success : function name(val) {
+               if( y["operation"] =='update' ){
+                $(ptr).css('background-color','blue');
+                $($(ptr).find("#like")).css('color','white');
+               }else{
+                $(ptr).css('background-color','white');
+                $($(ptr).find("#like")).css('color','black');
+               }
+             },
+             error : function name(params) {
+               alert("System error try after some time");
+             }
+
+           })
+}
+
+
+
+
+
+function deletepost(x){
+  var ptr = $($(x).parent()).parent();
+  $(ptr).css('display','none');
+}
+
+
+
+function openimage_view(x){
+  document.getElementById("back_gg").style.display = "block";
+  document.getElementById("imgdivs").style.display = "block";
+  document.getElementById("img_prof2").setAttribute("src",x.src);
+  $("#back_gg").css("height", $(document).height());
+  $('body').css('overflow','hidden');
+  $('#navigationbar').css('z-index','-1');
+}
+
+function closeimg() {
+  document.getElementById("imgdivs").style.display = "none";
+  document.getElementById("back_gg").style.display = "none";
+  $('#navigationbar').css('z-index','1');
+  $('body').css('overflow', 'scroll')
+}
+
+$(document).ready(function() {
+        // messages timeout for 10 sec 
+        setTimeout(function() { 
+            $('.message').fadeOut('slow');
+        }, 5000); // <-- time in milliseconds, 1000 =  1 sec
+
+    });
+
+</script>
+{% endblock %}
+
